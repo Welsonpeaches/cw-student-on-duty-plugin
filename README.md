@@ -3,7 +3,7 @@
 # 简介
 Class-Widgets 值日生插件，用于展示当天值日生信息
 目前已实现：
-14组值日生，每组四个人循环（多组或者每组人不一样没试过，可以自己试一试，不能用提issue），可以作为RinLit写官方功能之前的一个替代品
+14组值日生，每组四个人循环（多组或者每组人数不一样没试过，可以自己试一试，不能用提issue），可以作为RinLit写官方功能之前的一个替代品
 
 
 ![image](https://github.com/user-attachments/assets/825b66c3-2743-4fb2-8d67-d7aece71d0c2)
