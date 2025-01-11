@@ -80,7 +80,7 @@ class Plugin(PluginBase):  # 插件类
         for i in self.today_duty_list:
 
             self.today_duty_list2.append(i)
-            logger.info(self.today_duty_list2)
+            
 
         duty_1 = self.today_duty_list2[0]
         duty_2 = self.today_duty_list2[1]
