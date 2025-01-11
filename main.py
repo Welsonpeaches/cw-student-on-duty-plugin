@@ -15,10 +15,13 @@ from .ClassWidgets.base import PluginBase, SettingsBase, PluginConfig  # 导入C
 from PyQt5.QtWidgets import QHBoxLayout
 from qfluentwidgets import ImageLabel, LineEdit
 
+import json
+from datetime import datetime, timedelta
+
 
 WIDGET_CODE = 'cw-swtdents-on-duty.ui'  # 插件代号
 WIDGET_NAME = '值日生组件'  # 您的插件显示的名称
-WIDGET_WIDTH = 600
+WIDGET_WIDTH = 500
 
 
 
@@ -28,52 +31,11 @@ class Plugin(PluginBase):  # 插件类
         super().__init__(cw_contexts, method)  # 调用父类初始化方法
 
         self.method.register_widget(WIDGET_CODE, WIDGET_NAME, WIDGET_WIDTH)  # 注册小组件到CW
-        self.cfg = PluginConfig(self.PATH, 'config.json')  # 实例化配置类
+        self.cfg = PluginConfig(self.PATH, 'config.json')# 实例化配置类
+        self.script_dir = os.path.dirname(os.path.abspath(__file__))
+        self.json_file_path = os.path.join(self.script_dir, "duty.json")
 
 
-        self.file_path = "duty.txt"
-        self.start_date = datetime.now().date()
-        self.days = 30
-        self.students = self.read_duty_schedule()
-        self.schedule = self.assign_groups(self.students, self.start_date, self.days)
-
-    def read_duty_schedule(self):
-        students = []
-        with open("D:\Welson\Class_Widgets_Plugins\Class-Widgets\plugins\Students_On_Duty\duty.txt", 'r', encoding='utf-8') as file:
-            for i, line in enumerate(file.readlines()):
-                if i >= 4:
-                    break
-                students.append(line.strip())
-
-        return students
-
-    def assign_groups(self, students, start_date, days):
-        schedule = []
-        student_count = len(students)
-        index = 0
-
-        current_date = start_date
-        for _ in range(days):
-            if current_date.day % 5 == 0:
-                group_size = 2
-            else:
-                group_size = 1
-
-            group = []
-            for _ in range(group_size):
-                group.append(students[index])
-                index = (index + 1) % student_count
-
-            schedule.append((current_date.strftime('%Y-%m-%d'), group))
-            current_date += timedelta(days=1)
-
-        return schedule
-
-    def get_todays_duty(self, target_date):
-        for date, group in self.schedule:
-            if date == target_date.strftime('%Y-%m-%d'):
-                return group
-        return None
 
     def execute(self):  # 自启动执行部分
         # 小组件自定义（照PyQt的方法正常写）
@@ -91,22 +53,44 @@ class Plugin(PluginBase):  # 插件类
         logger.success('值日生插件加载成功！本插件开发者：月下的桃子')
         logger.success('我喜欢你')
 
+
+    def load_data_from_json(self,file_path):
+        with open(file_path, 'r') as file:
+            self.data_dict = json.load(file)
+        return self.data_dict['start_date'], self.data_dict['data']
+
+    def get_current_day_index(self,start_date_str):
+        self.start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+        self.current_date = datetime.now()
+        self.delta_days = (self.current_date - self.start_date).days
+        return self.delta_days % len(self.data_dict['data'])
+
+
     def update(self, cw_contexts):  # 自动更新部分
         super().update(cw_contexts)  # 调用父类更新方法
         self.cfg.update_config()  # 更新配置
 
-        start_date = datetime.now().date()  # 假设从今天开始安排
-        days = 30  # 假设我们要安排一个月的日程表
-        students = self.read_duty_schedule()
-        schedule = self.assign_groups(students, start_date, days)
+        self.duty = self.load_data_from_json(self.json_file_path)
+        self.start_date_str = '2024-09-01'
+        self.current_day_index = self.get_current_day_index(self.start_date_str)
+        data = self.data_dict['data']
+        self.today_duty_list = data[self.current_day_index]
+        self.today_duty_list2 = []
 
-        # 获取今天的值日生
-        today = datetime.now().date()
-        today_duty = self.get_todays_duty(today)
+        for i in self.today_duty_list:
+
+            self.today_duty_list2.append(i)
+            logger.info(self.today_duty_list2)
+
+        duty_1 = self.today_duty_list2[0]
+        duty_2 = self.today_duty_list2[1]
+        duty_3 = self.today_duty_list2[2]
+        duty_4 = self.today_duty_list2[3]
 
         if hasattr(self, 'students_on_duty_widget'):  # 判断小组件是否存在
             widget_title = f'今天的值日生'  # 标题内容
-            self.method.change_widget_content(WIDGET_CODE, widget_title, f'{today_duty}')
+            self.method.change_widget_content(WIDGET_CODE, widget_title, f'{duty_1},{duty_2},{duty_3},{duty_4}')
+
 
 
 
