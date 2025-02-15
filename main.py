@@ -90,7 +90,7 @@ class Plugin(PluginBase):  # 插件类
     def load_data_from_json(self, file_path):
         try:
             with open(file_path, 'r') as file:
-                self.data_dict = json.load(file, ensure_ascii=False).encode('utf-8')
+                self.data_dict = json.load(file, ensure_ascii=False).encode('gbk')
             return self.data_dict['start_date'], self.data_dict['data']
         except (FileNotFoundError):
             logger.error("未找到 duty.json 文件，请先设置duty.json!")
