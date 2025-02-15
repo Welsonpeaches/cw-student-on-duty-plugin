@@ -6,7 +6,8 @@ Class-Widgets 值日生插件，用于展示当天值日生信息
 14组值日生，每组四个人循环（多组可以或者每组人数不一样低于4个人也要在duty.json里每组写4个（没名字的空着），多于4个暂时不行，可以自己试一试，不能用提issue），可以作为RinLit写官方功能之前的一个替代品
 
 
-![image](https://github.com/user-attachments/assets/825b66c3-2743-4fb2-8d67-d7aece71d0c2)
+![image](https://github.com/user-attachments/assets/16f31385-5488-40c5-896d-fa7763b0b9c9)
+
 
 
 # 如何使用
