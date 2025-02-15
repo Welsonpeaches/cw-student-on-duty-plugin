@@ -1,7 +1,7 @@
 {
     "name": "值日生插件",
     "description": "cw值日生插件",
-    "version": "0.0.1",
+    "version": "0.0.3",
     "plugin_ver": 1,
     "author": "Peach",
     "settings": false,
