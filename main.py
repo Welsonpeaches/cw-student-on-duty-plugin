@@ -89,8 +89,8 @@ class Plugin(PluginBase):  # 插件类
 
     def load_data_from_json(self, file_path):
         try:
-            with open(file_path, 'r') as file:
-                self.data_dict = json.load(file, ensure_ascii=False).encode('gbk')
+            with open(file_path, 'r', encoding='utf-8') as file:
+                self.data_dict = json.load(file)
             return self.data_dict['start_date'], self.data_dict['data']
         except (FileNotFoundError):
             logger.error("未找到 duty.json 文件，请先设置duty.json!")
@@ -98,29 +98,35 @@ class Plugin(PluginBase):  # 插件类
     def get_current_day_index(self, start_date_str):
         self.start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
         self.current_date = datetime.now()
-        self.delta_days = (self.current_date - self.start_date).days
-        return self.delta_days % len(self.data_dict['data'])
+        if self.current_date.weekday() == 5 or self.current_date.weekday() == 6:
+            self.delta_days = None
+            return self.delta_days
+        else:
+            self.delta_days = (self.current_date - self.start_date).days
+            return self.delta_days % len(self.data_dict['data'])
 
     def update_duty_info(self, ):
         self.duty = self.load_data_from_json(self.json_file_path)
         self.start_date_str = self.data_dict['start_date']
         self.current_day_index = self.get_current_day_index(self.start_date_str)
         data = self.data_dict['data']
-        self.today_duty_list = data[self.current_day_index]
-        self.today_duty_list2 = []
+        if self.current_day_index != None:
+            self.today_duty_list = data[self.current_day_index]
+            self.today_duty_list2 = []
 
-        for i in self.today_duty_list:
-            self.today_duty_list2.append(i)
-
-        self.duty_1 = self.today_duty_list2[0]
-        self.duty_2 = self.today_duty_list2[1]
-        self.duty_3 = self.today_duty_list2[2]
-        self.duty_4 = self.today_duty_list2[3]
-        self.duty_names = f"""{self.duty_1}
+            for i in self.today_duty_list:
+                self.today_duty_list2.append(i)
+            self.duty_1 = self.today_duty_list2[0]
+            self.duty_2 = self.today_duty_list2[1]
+            self.duty_3 = self.today_duty_list2[2]
+            self.duty_4 = self.today_duty_list2[3]
+            self.duty_names = f"""{self.duty_1}
 {self.duty_2}
 {self.duty_3}
 {self.duty_4}"""
-        self.update_widget_content(self.duty_names)
+            self.update_widget_content(self.duty_names)
+        else:self.duty_names = "无值日生"
+
 
     def update_widget_content(self, duty_names):
         """更新小组件内容"""
